@@ -4,65 +4,15 @@ use anki::backend::init_backend;
 use anki::backend_proto::BackendService;
 use anki::backend_proto::{BackendInit, CloseCollectionIn, OpenCollectionIn};
 use bytes::BytesMut;
-use clap::{App, Arg, SubCommand};
+use clap::{load_yaml, App};
 use dirs::data_dir;
 use prost::Message;
 
 mod decks;
 
 fn main() {
-    let matches = App::new("anki-tui")
-        .version("0.1.0")
-        .author("Mattori Birnbaum <mattori.birnbaum@gmail.com>")
-        .about("A text interface to Anki")
-        .arg(
-            Arg::with_name("anki home")
-                .short("h")
-                .long("home")
-                .value_name("FILE")
-                .global(true)
-                .help("Base directory of Anki config files"),
-        )
-        .arg(
-            Arg::with_name("profile")
-                .short("p")
-                .long("profile")
-                .value_name("PROFILE")
-                .global(true)
-                .default_value("User 1")
-                .help("Anki profile name"),
-        )
-        .arg(
-            Arg::with_name("output-format")
-                .short("f")
-                .long("format")
-                .value_name("FORMAT")
-                .global(true)
-                .possible_values(&["pretty-json", "json"])
-                .default_value("pretty-json")
-                .help("Output serialization format"),
-        )
-        .subcommand(
-            SubCommand::with_name("list-decks")
-                .about("Display information about decks")
-                .arg(
-                    Arg::with_name("deck id")
-                        .short("i")
-                        .long("deck-id")
-                        .value_name("ID")
-                        .use_delimiter(true)
-                        .help("ID(s) of deck, comma separated"),
-                )
-                .arg(
-                    Arg::with_name("deck name")
-                        .short("n")
-                        .long("deck-name")
-                        .value_name("NAME")
-                        .use_delimiter(true)
-                        .help("name(s) of deck, comma separated"),
-                ),
-        )
-        .get_matches();
+    let cli_yaml = load_yaml!("cli.yml");
+    let matches = App::from_yaml(cli_yaml).get_matches();
 
     let base_dir: PathBuf = [
         matches
@@ -91,7 +41,7 @@ fn main() {
         _ => None,
     };
     if let Some(output_val) = output {
-        match matches.value_of("output-format").expect("output format") {
+        match matches.value_of("output format").expect("output format") {
             "pretty-json" => serde_json::to_writer_pretty(std::io::stdout(), &output_val),
             "json" => serde_json::to_writer(std::io::stdout(), &output_val),
             _ => Ok(()),
