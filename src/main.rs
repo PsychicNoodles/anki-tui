@@ -1,12 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use anki::backend::init_backend;
-use anki::backend_proto::BackendService;
-use anki::backend_proto::{BackendInit, CloseCollectionIn, OpenCollectionIn};
-use bytes::BytesMut;
+use anki::{collection::open_collection, i18n::I18n};
 use clap::{load_yaml, App};
+use decks::list_decks;
 use dirs::data_dir;
-use prost::Message;
+use slog::{slog_o, Drain, Logger};
+use slog_async::OverflowStrategy;
 
 mod decks;
 
@@ -34,10 +33,19 @@ fn main() {
     .iter()
     .collect();
 
-    let backend = open_backend(base_dir);
+    let logger = terminal();
+    let mut collection = open_collection(
+        base_dir.join("collection.anki2"),
+        base_dir.join("collection.media"),
+        base_dir.join("collection.media.db2"),
+        false,
+        I18n::new(&["en"], Path::new("en").join("fluent"), logger.clone()),
+        logger,
+    )
+    .expect("collection");
 
     let output = match matches.subcommand() {
-        ("list-decks", Some(subc)) => decks::list_decks(&backend, subc),
+        ("list-decks", Some(subc)) => list_decks(&mut collection, subc),
         _ => None,
     };
     if let Some(output_val) = output {
@@ -48,54 +56,16 @@ fn main() {
         }
         .expect("output");
     }
-
-    close_backend(backend);
 }
 
-fn open_backend(base_dir: PathBuf) -> anki::backend::Backend {
-    let backend_init = BackendInit {
-        locale_folder_path: Path::new("en")
-            .join("fluent")
-            .into_os_string()
-            .into_string()
-            .unwrap(),
-        preferred_langs: vec!["en".to_string()],
-        server: false,
-    };
-    let mut buf = BytesMut::with_capacity(1024);
-    backend_init.encode(&mut buf).expect("encode");
-    let backend = init_backend(&buf).unwrap();
-    backend
-        .open_collection(OpenCollectionIn {
-            collection_path: base_dir
-                .join("collection.anki2")
-                .into_os_string()
-                .into_string()
-                .unwrap(),
-            media_folder_path: base_dir
-                .join("collection.media")
-                .into_os_string()
-                .into_string()
-                .unwrap(),
-            media_db_path: base_dir
-                .join("collection.media.db2")
-                .into_os_string()
-                .into_string()
-                .unwrap(),
-            log_path: base_dir
-                .join("collection2.log")
-                .into_os_string()
-                .into_string()
-                .unwrap(),
-        })
-        .expect("open collection");
-    backend
-}
-
-fn close_backend(backend: anki::backend::Backend) {
-    backend
-        .close_collection(CloseCollectionIn {
-            downgrade_to_schema11: false,
-        })
-        .expect("close");
+fn terminal() -> Logger {
+    let decorator = slog_term::TermDecorator::new().build();
+    let drain = slog_term::FullFormat::new(decorator).build().fuse();
+    let drain = slog_envlogger::new(drain);
+    let drain = slog_async::Async::new(drain)
+        .chan_size(1_024)
+        .overflow_strategy(OverflowStrategy::Block)
+        .build()
+        .fuse();
+    Logger::root(drain, slog_o!())
 }

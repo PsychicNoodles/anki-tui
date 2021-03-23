@@ -111,7 +111,6 @@ name = "anki-tui"
 version = "0.1.0"
 dependencies = [
  "anki",
- "bytes 1.0.1",
  "clap",
  "dirs",
  "fluent-syntax",
@@ -120,6 +119,10 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "slog",
+ "slog-async",
+ "slog-envlogger",
+ "slog-term",
 ]
 
 [[package]]

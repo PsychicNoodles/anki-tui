@@ -41,3 +41,19 @@ subcommands:
             value_name: NAME
             use_delimiter: true
             help: name(s) of deck, comma-separated
+  - study:
+      about: Study next card in a deck
+      args:
+        - deck id:
+            short: i
+            long: deck-id
+            value_name: ID
+            help: ID of deck
+            required: true
+        - side:
+            short: s
+            long: side
+            value_name: SIDE
+            possible_values: [back, question, front, answer]
+            default_value: back
+            help: side of the card (back/question or front/answer)

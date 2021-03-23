@@ -3,10 +3,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use anki::{
-    backend::Backend,
-    backend_proto::{BackendService, DeckTreeIn, DeckTreeNode},
-};
+use anki::{backend_proto::DeckTreeNode, collection::Collection, timestamp::TimestampSecs};
 use clap::ArgMatches;
 use serde::Serialize;
 
@@ -37,7 +34,7 @@ impl From<DeckTreeNode> for Deck {
     }
 }
 
-pub fn list_decks(backend: &Backend, matches: &ArgMatches) -> Option<Vec<Deck>> {
+pub fn list_decks(collection: &mut Collection, matches: &ArgMatches) -> Option<Vec<Deck>> {
     let filter_ids: HashSet<i64> = matches
         .values_of("deck id")
         .map(|vals| vals.map(str::parse).flatten().collect())
@@ -48,25 +45,21 @@ pub fn list_decks(backend: &Backend, matches: &ArgMatches) -> Option<Vec<Deck>> 
         .map(|vals| vals.collect())
         .unwrap_or_default();
 
-    // let deck_names = backend
-    //     .get_deck_names(GetDeckNamesIn {
-    //         skip_empty_default: false,
-    //         include_filtered: true,
-    //     })
-    //     .unwrap();
-
-    let deck_tree = backend
-        .deck_tree(DeckTreeIn {
-            now: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("time went backwards")
-                .as_secs() as i64,
-            top_deck_id: 0,
-        })
+    let deck_tree = collection
+        .deck_tree(
+            Some(TimestampSecs(
+                SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("time went backwards")
+                    .as_secs() as i64,
+            )),
+            None,
+        )
         .expect("deck tree");
 
-    // first item is a container for the actual decks
-    let decks = DeckTreeNodeIter::from(deck_tree).skip(1).map(Deck::from);
+    let decks = DeckTreeNodeIter::from(deck_tree)
+        .filter(|n| n.deck_id != 0)
+        .map(Deck::from);
 
     Some(
         decks
