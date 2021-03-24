@@ -18,7 +18,6 @@ pub fn now() -> TimestampSecs {
 #[derive(Serialize)]
 pub struct Output {
     pub status: i64,
-    #[serde(flatten)]
     pub message: MessageType,
 }
 
