@@ -54,6 +54,6 @@ subcommands:
             short: s
             long: side
             value_name: SIDE
-            possible_values: [back, question, front, answer]
+            possible_values: [back, question, front, answer, both]
             default_value: back
-            help: side of the card (back/question or front/answer)
+            help: side of the card (back/question, front/answer, or both)

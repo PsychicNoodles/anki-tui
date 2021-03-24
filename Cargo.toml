@@ -18,6 +18,7 @@ slog = "2.7.0"
 slog-term = "2.8.0"
 slog-envlogger = "2.2.0"
 slog-async = "2.6.0"
+derive_more = "0.99.13"
 
 [build-dependencies]
 fluent-syntax = "0.10"

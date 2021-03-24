@@ -7,6 +7,8 @@ use anki::{backend_proto::DeckTreeNode, collection::Collection, timestamp::Times
 use clap::ArgMatches;
 use serde::Serialize;
 
+use crate::util::{now, Output};
+
 #[derive(Serialize, Default, PartialEq, Eq, Hash)]
 pub struct Deck {
     id: i64,
@@ -34,7 +36,7 @@ impl From<DeckTreeNode> for Deck {
     }
 }
 
-pub fn list_decks(collection: &mut Collection, matches: &ArgMatches) -> Option<Vec<Deck>> {
+pub fn list_decks(collection: &mut Collection, matches: &ArgMatches) -> Output {
     let filter_ids: HashSet<i64> = matches
         .values_of("deck id")
         .map(|vals| vals.map(str::parse).flatten().collect())
@@ -45,29 +47,22 @@ pub fn list_decks(collection: &mut Collection, matches: &ArgMatches) -> Option<V
         .map(|vals| vals.collect())
         .unwrap_or_default();
 
-    let deck_tree = collection
-        .deck_tree(
-            Some(TimestampSecs(
-                SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .expect("time went backwards")
-                    .as_secs() as i64,
-            )),
-            None,
-        )
-        .expect("deck tree");
+    let deck_tree = collection.deck_tree(Some(now()), None).expect("deck tree");
 
     let decks = DeckTreeNodeIter::from(deck_tree)
         .filter(|n| n.deck_id != 0)
         .map(Deck::from);
 
-    Some(
-        decks
-            .filter(|d| filter_ids.is_empty() || filter_ids.contains(&d.id))
-            .filter(|d| filter_names.is_empty() || filter_names.contains(&d.name.as_str()))
-            .into_iter()
-            .collect::<Vec<_>>(),
-    )
+    Output {
+        status: 0,
+        message: From::from(
+            decks
+                .filter(|d| filter_ids.is_empty() || filter_ids.contains(&d.id))
+                .filter(|d| filter_names.is_empty() || filter_names.contains(&d.name.as_str()))
+                .into_iter()
+                .collect::<Vec<_>>(),
+        ),
+    }
 }
 
 #[derive(Default)]

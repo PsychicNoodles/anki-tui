@@ -4,10 +4,15 @@ use anki::{collection::open_collection, i18n::I18n};
 use clap::{load_yaml, App};
 use decks::list_decks;
 use dirs::data_dir;
+use review::study_card;
+use serde::Serialize;
 use slog::{slog_o, Drain, Logger};
 use slog_async::OverflowStrategy;
+use util::Output;
 
 mod decks;
+mod review;
+mod util;
 
 fn main() {
     let cli_yaml = load_yaml!("cli.yml");
@@ -44,14 +49,21 @@ fn main() {
     )
     .expect("collection");
 
-    let output = match matches.subcommand() {
-        ("list-decks", Some(subc)) => list_decks(&mut collection, subc),
-        _ => None,
-    };
-    if let Some(output_val) = output {
-        match matches.value_of("output format").expect("output format") {
-            "pretty-json" => serde_json::to_writer_pretty(std::io::stdout(), &output_val),
-            "json" => serde_json::to_writer(std::io::stdout(), &output_val),
+    print_output(
+        matches.value_of("output format").expect("output format"),
+        match matches.subcommand() {
+            ("list-decks", Some(subc)) => Some(list_decks(&mut collection, subc)),
+            ("study", Some(subc)) => Some(study_card(&mut collection, subc)),
+            _ => None,
+        },
+    );
+}
+
+fn print_output(format: &str, output: Option<Output>) {
+    if let Some(output_val) = output.as_ref() {
+        match format {
+            "pretty-json" => serde_json::to_writer_pretty(std::io::stdout(), output_val),
+            "json" => serde_json::to_writer(std::io::stdout(), output_val),
             _ => Ok(()),
         }
         .expect("output");
