@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "anki"
 version = "0.0.0"
-source = "git+https://github.com/PsychicNoodles/anki.git?branch=release/2.1.42#3624a7cfcb846e80c6a55ed6b4ad46e3efa40e72"
+source = "git+https://github.com/PsychicNoodles/anki.git?branch=release/2.1.42#9de965bce3004a39aebc430197f39f0db95ce3ce"
 dependencies = [
  "ammonia",
  "askama",

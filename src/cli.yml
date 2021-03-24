@@ -49,7 +49,6 @@ subcommands:
             long: deck-id
             value_name: ID
             help: ID of deck
-            # required: true
         - side:
             short: s
             long: side

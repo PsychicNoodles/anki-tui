@@ -45,7 +45,16 @@ impl From<RenderedNode> for CardContent {
 // todo counts
 
 pub fn study_card(collection: &mut Collection, matches: &ArgMatches) -> Output {
-    // todo deck id
+    if let Some(deck_id) = matches
+        .value_of("deck id")
+        .map(str::parse)
+        .map(Result::unwrap)
+    {
+        collection
+            .set_current_deck_id(deck_id)
+            .expect("set current deck");
+    }
+
     let mut card = next_card(collection).expect("next card");
 
     match matches.value_of("side").expect("side") {
