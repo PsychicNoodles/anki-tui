@@ -13,6 +13,7 @@ pub struct Card {
 }
 
 #[derive(Serialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
 pub enum CardContent {
     Text {
         text: String,

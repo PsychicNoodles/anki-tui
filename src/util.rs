@@ -23,6 +23,7 @@ pub struct Output {
 }
 
 #[derive(Serialize, From)]
+#[serde(untagged)]
 pub enum MessageType {
     Decks(Vec<Deck>),
     Card(Card),
