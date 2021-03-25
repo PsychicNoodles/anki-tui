@@ -70,11 +70,10 @@ pub enum MessageType {
     Message(String),
 }
 
-#[serde_as]
-#[derive(Error, Debug, Serialize)]
+#[derive(Error, Debug)]
 pub enum Error {
     #[error("anki error: {0}")]
-    Anki(#[serde_as(as = "DisplayFromStr")] AnkiError),
+    Anki(AnkiError),
     #[error("invalid parameter `{0}`, must be `{1}`")]
     InvalidParam(String, String),
 }

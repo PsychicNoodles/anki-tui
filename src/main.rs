@@ -64,10 +64,10 @@ fn main() {
 
 fn print_output(format: &str, output: ApiResult) {
     match output.as_ref() {
-        Ok(msg) => write_format(format, msg),
-        Err(err) => write_format(format, err),
-    }
-    .expect("print output");
+        Ok(&MessageType::Empty) => {}
+        Ok(msg) => write_format(format, msg).expect("print output"),
+        Err(err) => eprintln!("{}", err),
+    };
 }
 
 fn write_format<T: Serialize>(format: &str, out: &T) -> Result<(), serde_json::Error> {
