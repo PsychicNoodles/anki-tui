@@ -8,6 +8,7 @@ use crate::util::{now_secs, ApiResult, Output};
 
 #[derive(Serialize)]
 pub struct Card {
+    id: i64,
     back: Vec<CardContent>,
     front: Vec<CardContent>,
 }
@@ -74,6 +75,7 @@ fn next_card(collection: &mut Collection) -> Result<Card, AnkiError> {
     collection
         .render_existing_card(next.id, false)
         .map(|card| Card {
+            id: From::from(next.id),
             back: card.qnodes.into_iter().map(From::from).collect(),
             front: card.anodes.into_iter().map(From::from).collect(),
         })
