@@ -4,7 +4,7 @@ use anki::{backend::Backend, collection::Collection, prelude::AnkiError, templat
 use clap::ArgMatches;
 use serde::Serialize;
 
-use crate::util::{now, Output};
+use crate::util::{now_secs, ApiResult, Output};
 
 #[derive(Serialize)]
 pub struct Card {
@@ -44,7 +44,7 @@ impl From<RenderedNode> for CardContent {
 
 // todo counts
 
-pub fn study_card(collection: &mut Collection, matches: &ArgMatches) -> Output {
+pub fn study_card(collection: &mut Collection, matches: &ArgMatches) -> ApiResult {
     if let Some(deck_id) = matches
         .value_of("deck id")
         .map(str::parse)
@@ -63,16 +63,13 @@ pub fn study_card(collection: &mut Collection, matches: &ArgMatches) -> Output {
         _ => {}
     };
 
-    Output {
-        status: 0,
-        message: From::from(card),
-    }
+    Ok(From::from(card))
 }
 
 fn next_card(collection: &mut Collection) -> Result<Card, AnkiError> {
     let next = collection
         .get_queues()?
-        .next_entry(now())
+        .next_entry(now_secs())
         .expect("next card");
     collection
         .render_existing_card(next.id, false)

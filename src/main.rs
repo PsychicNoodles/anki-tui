@@ -1,18 +1,20 @@
 use std::path::{Path, PathBuf};
 
 use anki::{collection::open_collection, i18n::I18n};
+use answer::answer;
 use clap::{load_yaml, App};
 use decks::list_decks;
 use dirs::data_dir;
-use review::study_card;
 use serde::Serialize;
 use slog::{slog_o, Drain, Logger};
 use slog_async::OverflowStrategy;
-use util::Output;
+use util::{ApiResult, MessageType};
+use view_card::study_card;
 
+mod answer;
 mod decks;
-mod review;
 mod util;
+mod view_card;
 
 fn main() {
     let cli_yaml = load_yaml!("cli.yml");
@@ -52,21 +54,27 @@ fn main() {
     print_output(
         matches.value_of("output format").expect("output format"),
         match matches.subcommand() {
-            ("list-decks", Some(subc)) => Some(list_decks(&mut collection, subc)),
-            ("study", Some(subc)) => Some(study_card(&mut collection, subc)),
-            _ => None,
+            ("list-decks", Some(subc)) => list_decks(&mut collection, subc),
+            ("study", Some(subc)) => study_card(&mut collection, subc),
+            ("answer", Some(subc)) => answer(&mut collection, subc),
+            _ => Ok(MessageType::Empty),
         },
     );
 }
 
-fn print_output(format: &str, output: Option<Output>) {
-    if let Some(output_val) = output.as_ref() {
-        match format {
-            "pretty-json" => serde_json::to_writer_pretty(std::io::stdout(), output_val),
-            "json" => serde_json::to_writer(std::io::stdout(), output_val),
-            _ => Ok(()),
-        }
-        .expect("output");
+fn print_output(format: &str, output: ApiResult) {
+    match output.as_ref() {
+        Ok(msg) => write_format(format, msg),
+        Err(err) => write_format(format, err),
+    }
+    .expect("print output");
+}
+
+fn write_format<T: Serialize>(format: &str, out: &T) -> Result<(), serde_json::Error> {
+    match format {
+        "pretty-json" => serde_json::to_writer_pretty(std::io::stdout(), out),
+        "json" => serde_json::to_writer(std::io::stdout(), out),
+        _ => Ok(()),
     }
 }
 
