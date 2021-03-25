@@ -68,9 +68,9 @@ subcommands:
             short: t
             long: time-taken
             value_name: MILLIS
-            default_value: 0
+            default_value: "0"
             help: Time taken to answer card in milliseconds, default 0
         - answer:
-            possible_values: [again, 1, hard, 2, good, 3, easy, 4]
+            possible_values: [again, "1", hard, "2", good, "3", easy, "4"]
             required: true
             help: Answer rating (again/1, hard/2, good/3, easy/4)
