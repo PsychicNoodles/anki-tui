@@ -1,10 +1,10 @@
-use std::convert::TryFrom;
 
-use anki::{backend::Backend, collection::Collection, prelude::AnkiError, template::RenderedNode};
+
+use anki::{collection::Collection, prelude::AnkiError, template::RenderedNode};
 use clap::ArgMatches;
 use serde::Serialize;
 
-use crate::util::{now_secs, ApiResult, Output};
+use crate::util::{now_secs, ApiResult};
 
 #[derive(Serialize)]
 pub struct Card {

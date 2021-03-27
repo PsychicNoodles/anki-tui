@@ -1,4 +1,4 @@
-use anki::{collection::Collection, decks::DeckID, notetype::NoteTypeID};
+use anki::collection::Collection;
 use clap::ArgMatches;
 
 use crate::util::{ApiResult, Error};
@@ -21,12 +21,12 @@ pub fn add_note(collection: &mut Collection, matches: &ArgMatches) -> ApiResult 
     for (i, field) in matches.values_of("fields").expect("fields").enumerate() {
         new_note
             .set_field(i, field)
-            .expect(&format!("setting field {}", i));
+            .unwrap_or_else(|_| panic!("setting field {}", i));
     }
 
-    matches
-        .values_of("tags")
-        .map(|tags| new_note.tags.append(&mut tags.map(str::to_owned).collect()));
+    if let Some(tags) = matches.values_of("tags") {
+        new_note.tags.append(&mut tags.map(str::to_owned).collect())
+    }
 
     collection
         .add_note(&mut new_note, deck_id)

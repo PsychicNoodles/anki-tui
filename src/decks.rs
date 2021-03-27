@@ -1,13 +1,12 @@
 use std::{
     collections::{HashSet, VecDeque},
-    time::{SystemTime, UNIX_EPOCH},
 };
 
-use anki::{backend_proto::DeckTreeNode, collection::Collection, timestamp::TimestampSecs};
+use anki::{backend_proto::DeckTreeNode, collection::Collection};
 use clap::ArgMatches;
 use serde::Serialize;
 
-use crate::util::{now_secs, ApiResult, Output};
+use crate::util::{now_secs, ApiResult};
 
 #[derive(Serialize, Default, PartialEq, Eq, Hash)]
 pub struct Deck {
