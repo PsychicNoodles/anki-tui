@@ -24,6 +24,10 @@ pub fn add_note(collection: &mut Collection, matches: &ArgMatches) -> ApiResult 
             .expect(&format!("setting field {}", i));
     }
 
+    matches
+        .values_of("tags")
+        .map(|tags| new_note.tags.append(&mut tags.map(str::to_owned).collect()));
+
     collection
         .add_note(&mut new_note, deck_id)
         .map(From::from)

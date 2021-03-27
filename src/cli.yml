@@ -89,6 +89,12 @@ subcommands:
             value_name: ID/NAME
             required: true
             help: ID or name of note type
+        - tags:
+            short: a
+            long: tag
+            value_name: TAG
+            use_delimiter: true
+            help: Note tags
         - fields:
             value_name: VALUE
             number_of_values: 1
