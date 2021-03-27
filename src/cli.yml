@@ -74,3 +74,23 @@ subcommands:
             possible_values: [again, "1", hard, "2", good, "3", easy, "4"]
             required: true
             help: Answer rating (again/1, hard/2, good/3, easy/4)
+  - add:
+      about: Add a note
+      args:
+        - deck id:
+            short: d
+            long: deck-id
+            value_name: ID
+            required: true
+            help: ID of deck to add to
+        - note type:
+            short: t
+            long: note-type
+            value_name: ID/NAME
+            required: true
+            help: ID or name of note type
+        - fields:
+            value_name: VALUE
+            number_of_values: 1
+            multiple: true
+            help: Values for fields of the note
