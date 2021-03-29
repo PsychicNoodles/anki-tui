@@ -100,3 +100,13 @@ subcommands:
             number_of_values: 1
             multiple: true
             help: Values for fields of the note
+  - note-types:
+      about: Note type information
+      args:
+        - note ids:
+            short: i
+            long: note-ids
+            value_name: ID
+            multiple: true
+            use_delimiter: true
+            help: ID of note type, can be multiple

@@ -6,6 +6,7 @@ use clap::{load_yaml, App};
 use decks::list_decks;
 use dirs::data_dir;
 use note::add_note;
+use notetype::view_notetypes;
 use serde::Serialize;
 use slog::{slog_o, Drain, Logger};
 use slog_async::OverflowStrategy;
@@ -15,6 +16,7 @@ use view_card::study_card;
 mod answer;
 mod decks;
 mod note;
+mod notetype;
 mod util;
 mod view_card;
 
@@ -60,6 +62,7 @@ fn main() {
             ("study", Some(subc)) => study_card(&mut collection, subc),
             ("answer", Some(subc)) => answer(&mut collection, subc),
             ("add", Some(subc)) => add_note(&mut collection, subc),
+            ("note-types", Some(subc)) => view_notetypes(&mut collection, subc),
             _ => Ok(MessageType::Empty),
         },
     );

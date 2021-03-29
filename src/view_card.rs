@@ -1,5 +1,3 @@
-
-
 use anki::{collection::Collection, prelude::AnkiError, template::RenderedNode};
 use clap::ArgMatches;
 use serde::Serialize;

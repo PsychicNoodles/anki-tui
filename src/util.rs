@@ -10,10 +10,9 @@ use anki::{
 use derive_more::From;
 use serde::Serialize;
 
-
 use thiserror::Error;
 
-use crate::{decks::Deck, view_card::Card};
+use crate::{decks::Deck, notetype::NoteType, view_card::Card};
 
 pub fn now_secs() -> TimestampSecs {
     TimestampSecs(
@@ -66,6 +65,7 @@ pub enum Status {
 pub enum MessageType {
     Decks(Vec<Deck>),
     Card(Card),
+    NoteTypes(Vec<NoteType>),
     Empty,
     Message(String),
 }
@@ -76,6 +76,10 @@ pub enum Error {
     Anki(AnkiError),
     #[error("invalid parameter `{0}`, must be `{1}`")]
     InvalidParam(String, String),
+    #[error("no results found")]
+    NoResults,
+    #[error("invalid number format `{0}`, must be in `[{1}]`")]
+    InvalidNumber(String, String),
 }
 
 pub type ApiResult = std::result::Result<MessageType, Error>;
