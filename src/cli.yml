@@ -63,6 +63,7 @@ subcommands:
             short: i
             long: card-id
             value_name: ID
+            required: true
             help: ID of card
         - time taken:
             short: t
@@ -110,3 +111,34 @@ subcommands:
             multiple: true
             use_delimiter: true
             help: ID of note type, can be multiple
+  - edit:
+      about: Edit a note
+      args:
+        - card id:
+            short: i
+            long: card-id
+            value_name: ID
+            required: true
+            help: ID of card
+        - deck id:
+            short: d
+            long: deck-id
+            value_name: ID
+            help: New deck ID
+        - note type id:
+            short: n
+            long: note-type-id
+            value_name: ID
+            help: New note type id
+        - tags:
+            short: a
+            long: tag
+            value_name: TAG
+            use_delimiter: true
+            help: New note tags
+        - fields:
+            value_name: VALUE
+            number_of_values: 1
+            multiple: true
+            help: Values for fields of the note
+# todo groups id/name for common types like card, deck, note type

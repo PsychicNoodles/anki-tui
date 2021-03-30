@@ -3,6 +3,8 @@ use clap::ArgMatches;
 
 use crate::util::{ApiResult, Error};
 
+use super::{add_tags, set_fields};
+
 pub fn add_note(collection: &mut Collection, matches: &ArgMatches) -> ApiResult {
     let deck_id = matches
         .value_of("deck id")
@@ -18,14 +20,10 @@ pub fn add_note(collection: &mut Collection, matches: &ArgMatches) -> ApiResult 
     .expect("existing note type");
     let mut new_note = note_type.new_note();
 
-    for (i, field) in matches.values_of("fields").expect("fields").enumerate() {
-        new_note
-            .set_field(i, field)
-            .unwrap_or_else(|_| panic!("setting field {}", i));
-    }
+    set_fields(&mut new_note, matches);
 
     if let Some(tags) = matches.values_of("tags") {
-        new_note.tags.append(&mut tags.map(str::to_owned).collect())
+        add_tags(&mut new_note, tags);
     }
 
     collection

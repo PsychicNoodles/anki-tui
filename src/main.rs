@@ -5,7 +5,7 @@ use answer::answer;
 use clap::{load_yaml, App};
 use decks::list_decks;
 use dirs::data_dir;
-use note::add_note;
+use note::{add::add_note, edit::edit_card};
 use notetype::view_notetypes;
 use serde::Serialize;
 use slog::{slog_o, Drain, Logger};
@@ -63,6 +63,7 @@ fn main() {
             ("answer", Some(subc)) => answer(&mut collection, subc),
             ("add", Some(subc)) => add_note(&mut collection, subc),
             ("note-types", Some(subc)) => view_notetypes(&mut collection, subc),
+            ("edit", Some(subc)) => edit_card(&mut collection, subc),
             _ => Ok(MessageType::Empty),
         },
     );
