@@ -3,7 +3,7 @@ use clap::ArgMatches;
 
 use crate::util::{ApiResult, Error, MessageType};
 
-use super::add_tags;
+use super::{add_tags, set_fields};
 
 pub fn edit_card(collection: &mut Collection, matches: &ArgMatches) -> ApiResult {
     let card_id = matches
@@ -40,6 +40,10 @@ pub fn edit_card(collection: &mut Collection, matches: &ArgMatches) -> ApiResult
         note.tags.clear();
         add_tags(&mut note, tags);
         needs_update = true;
+    }
+
+    if let Some(fields) = matches.values_of("fields") {
+        set_fields(&mut note, fields);
     }
 
     if needs_update {

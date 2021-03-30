@@ -20,7 +20,7 @@ pub fn add_note(collection: &mut Collection, matches: &ArgMatches) -> ApiResult 
     .expect("existing note type");
     let mut new_note = note_type.new_note();
 
-    set_fields(&mut new_note, matches);
+    set_fields(&mut new_note, matches.values_of("fields").expect("fields"));
 
     if let Some(tags) = matches.values_of("tags") {
         add_tags(&mut new_note, tags);
