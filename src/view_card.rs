@@ -1,8 +1,8 @@
-use anki::{collection::Collection, prelude::AnkiError, template::RenderedNode};
+use anki::{card::CardID, collection::Collection, prelude::AnkiError, template::RenderedNode};
 use clap::ArgMatches;
 use serde::Serialize;
 
-use crate::util::{now_secs, ApiResult};
+use crate::util::{now_secs, ApiResult, Error};
 
 #[derive(Serialize)]
 pub struct Card {
@@ -70,11 +70,26 @@ fn next_card(collection: &mut Collection) -> Result<Card, AnkiError> {
         .get_queues()?
         .next_entry(now_secs())
         .expect("next card");
-    collection
-        .render_existing_card(next.id, false)
-        .map(|card| Card {
-            id: From::from(next.id),
-            back: card.qnodes.into_iter().map(From::from).collect(),
-            front: card.anodes.into_iter().map(From::from).collect(),
-        })
+    render(collection, next.id)
+}
+
+fn render(mut collection: &mut Collection, id: CardID) -> Result<Card, AnkiError> {
+    collection.render_existing_card(id, false).map(|card| Card {
+        id: From::from(id),
+        back: card.qnodes.into_iter().map(From::from).collect(),
+        front: card.anodes.into_iter().map(From::from).collect(),
+    })
+}
+
+pub fn search(collection: &mut Collection, matches: &ArgMatches) -> ApiResult {
+    let search_text = matches.value_of("text").expect("text");
+
+    let note_ids = collection
+        .search_notes(search_text)
+        .or(Err(Error::NoResults))?;
+
+    note_ids
+        .into_iter()
+        .map(|id| render(collection, id))
+        .collect()
 }

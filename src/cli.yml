@@ -141,4 +141,11 @@ subcommands:
             number_of_values: 1
             multiple: true
             help: Values for fields of the note
+  - search:
+      about: Search for notes
+      args:
+        - text:
+            value_name: TEXT
+            required: true
+            help: Search text
 # todo groups id/name for common types like card, deck, note type
